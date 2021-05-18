@@ -12,12 +12,6 @@ public class StoreApplication {
         SpringApplication.run(StoreApplication.class, args);
     }
 
-    @Bean
-    public FilterRegistrationBean filterRegistrationBean() {
-        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-        filterRegistrationBean.setFilter(new JwtFilter());
-        filterRegistrationBean.setUrlPatterns(Collections.singleton("/api/hello/*"));
-        return filterRegistrationBean;
-    }
+
 
 }
