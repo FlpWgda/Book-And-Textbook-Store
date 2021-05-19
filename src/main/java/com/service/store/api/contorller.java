@@ -22,7 +22,7 @@ public class contorller {
                 .setExpiration(new Date(now + 10000)) // 4
                 .signWith(SignatureAlgorithm.HS512, "secretkey").compact(); // 5
     }
-    @RequestMapping(value = "/user/{username}",
+    @RequestMapping(value = "/test",
             method = RequestMethod.GET)
     public String test(){
         return "test";
