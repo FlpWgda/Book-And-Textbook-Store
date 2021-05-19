@@ -7,10 +7,7 @@ import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -26,7 +23,8 @@ public class SecurityApi {
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping("/logIn")
+    @RequestMapping(value = "/logIn",
+            method = RequestMethod.POST)
     public ResponseEntity<Map<String,String>> login(@RequestBody Map<String,String> userInfo) {
         long currentTimeMillis = System.currentTimeMillis();
         String token = Jwts.builder()
@@ -40,8 +38,10 @@ public class SecurityApi {
         tokenMap.put("token", token);
         return new ResponseEntity(tokenMap, HttpStatus.OK);
     }
-    @PostMapping("/register")
+    @RequestMapping(value = "/register",
+            method = RequestMethod.POST)
     public ResponseEntity<String> register(@RequestBody User user){
+        System.out.println("Hello");
         Optional<User> tempUser = userRepository.findById(user.getLogin());
         if(tempUser.isPresent()){
             return new ResponseEntity<>("Username already taken",HttpStatus.CONFLICT);
