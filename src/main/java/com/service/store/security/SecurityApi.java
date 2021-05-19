@@ -27,11 +27,11 @@ public class SecurityApi {
     private UserRepository userRepository;
 
     @PostMapping("/logIn")
-    public ResponseEntity<Map<String,String>> login(@RequestBody User user) {
+    public ResponseEntity<Map<String,String>> login(@RequestBody Map<String,String> userInfo) {
         long currentTimeMillis = System.currentTimeMillis();
         String token = Jwts.builder()
-                .setSubject(user.getLogin())
-                .claim("user","filip")
+                .setSubject(userInfo.get("login"))
+                .claim("user",userInfo.get("login"))
                 .setIssuedAt(new Date(currentTimeMillis))
                 .setExpiration(new Date(currentTimeMillis + 2000000))
                 .signWith(JwtFilter.secretKey)
