@@ -36,6 +36,8 @@ public class Item {
     @JoinTable
     private List<Category> categories;
 
+
+
     @ManyToOne
     private User user;
 
@@ -120,5 +122,13 @@ public class Item {
 
     public void setCategories(List<Category> categories) {
         this.categories = categories;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
