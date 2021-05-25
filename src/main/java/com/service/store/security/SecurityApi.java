@@ -31,16 +31,22 @@ public class SecurityApi {
         long currentTimeMillis = System.currentTimeMillis();
         Optional<User> userOptional = userRepository.findById(userInfo.get("login"));
         if(userOptional.isPresent()){
-            String token = Jwts.builder()
-                    .setSubject(userInfo.get("login"))
-                    .claim("login",userOptional.get().getLogin())
-                    .setIssuedAt(new Date(currentTimeMillis))
-                    .setExpiration(new Date(currentTimeMillis + 2000000))
-                    .signWith(JwtFilter.secretKey)
-                    .compact();
-            Map<String,String> tokenMap = new HashMap<>();
-            tokenMap.put("token", token);
-            return new ResponseEntity<>(tokenMap, HttpStatus.OK);
+            if(userOptional.get().getPassword().equals(userInfo.get("password"))){
+                String token = Jwts.builder()
+                        .setSubject(userInfo.get("login"))
+                        .claim("login",userOptional.get().getLogin())
+                        .setIssuedAt(new Date(currentTimeMillis))
+                        .setExpiration(new Date(currentTimeMillis + 2000000))
+                        .signWith(JwtFilter.secretKey)
+                        .compact();
+                Map<String,String> tokenMap = new HashMap<>();
+                tokenMap.put("token", token);
+                return new ResponseEntity<>(tokenMap, HttpStatus.OK);
+            }
+            else{
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
+
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
