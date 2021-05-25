@@ -1,10 +1,14 @@
 package com.service.store.security;
 
+import com.service.store.dao.UserRepository;
+import com.service.store.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
@@ -17,6 +21,7 @@ import java.io.IOException;
 public class JwtFilter implements javax.servlet.Filter {
 
     static SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {

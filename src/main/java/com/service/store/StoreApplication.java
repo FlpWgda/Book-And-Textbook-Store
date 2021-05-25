@@ -19,7 +19,7 @@ public class StoreApplication {
     public FilterRegistrationBean filterRegistrationBean() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
         filterRegistrationBean.setFilter(new JwtFilter());
-        filterRegistrationBean.setUrlPatterns(Collections.singleton("/api/hello/*"));
+        filterRegistrationBean.setUrlPatterns(Collections.singleton("/api/*"));
         return filterRegistrationBean;
     }
 
