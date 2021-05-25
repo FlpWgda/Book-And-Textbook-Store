@@ -7,23 +7,12 @@ import javax.persistence.*;
 public class ImageUrl {
 
     @Id
-    private Integer imageUrlId;
-
     private String url;
 
-    @ManyToOne
-    private Item item;
 
     public ImageUrl() {
     }
 
-    public Integer getImageUrlId() {
-        return imageUrlId;
-    }
-
-    public void setImageUrlId(Integer imageUrlId) {
-        this.imageUrlId = imageUrlId;
-    }
 
     public String getUrl() {
         return url;
@@ -33,11 +22,4 @@ public class ImageUrl {
         this.url = url;
     }
 
-    public Item getItem() {
-        return item;
-    }
-
-    public void setItem(Item item) {
-        this.item = item;
-    }
 }

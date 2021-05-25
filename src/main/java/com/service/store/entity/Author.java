@@ -7,24 +7,12 @@ import java.util.List;
 @Table
 public class Author {
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Integer authorId;
 
+    @Id
     private String name;
 
-    @ManyToMany(mappedBy = "authors")
-    private List<Item> items;
 
     public Author() {
-    }
-
-    public Integer getAuthorId() {
-        return authorId;
-    }
-
-    public void setAuthorId(Integer authorId) {
-        this.authorId = authorId;
     }
 
     public String getName() {
@@ -33,13 +21,5 @@ public class Author {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<Item> getItems() {
-        return items;
-    }
-
-    public void setItems(List<Item> items) {
-        this.items = items;
     }
 }
