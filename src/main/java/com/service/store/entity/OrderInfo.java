@@ -19,7 +19,7 @@ public class OrderInfo {
     private Timestamp dateOfLastModification;
 
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn
     private ListOfItems listOfItems;
 
