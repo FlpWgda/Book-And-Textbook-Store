@@ -22,8 +22,6 @@ public class ListOfItems {
     @JoinTable
     private List<Item> items;
 
-    @ManyToOne
-    private User user;
 
     public ListOfItems() {
     }
@@ -66,13 +64,5 @@ public class ListOfItems {
 
     public void setItems(List<Item> items) {
         this.items = items;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }

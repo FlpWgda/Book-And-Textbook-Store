@@ -26,6 +26,12 @@ public class Item {
 
     private Timestamp dateAdded;
 
+    private Integer releaseYear;
+
+
+    @Enumerated(EnumType.STRING)
+    private ItemCondition itemCondition;
+
     private boolean visible;
 
     @ManyToMany
@@ -35,11 +41,6 @@ public class Item {
     @ManyToMany
     @JoinTable
     private List<Category> categories;
-
-
-
-    @ManyToOne
-    private User user;
 
     public Item() {
     }
@@ -124,11 +125,20 @@ public class Item {
         this.categories = categories;
     }
 
-    public User getUser() {
-        return user;
+
+    public ItemCondition getItemCondition() {
+        return itemCondition;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setItemCondition(ItemCondition itemCondition) {
+        this.itemCondition = itemCondition;
+    }
+
+    public Integer getReleaseYear() {
+        return releaseYear;
+    }
+
+    public void setReleaseYear(Integer releaseYear) {
+        this.releaseYear = releaseYear;
     }
 }

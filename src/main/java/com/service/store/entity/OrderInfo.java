@@ -18,8 +18,6 @@ public class OrderInfo {
 
     private Timestamp dateOfLastModification;
 
-    @ManyToOne
-    private User user;
 
     @ManyToOne
     @JoinColumn
@@ -60,13 +58,6 @@ public class OrderInfo {
         this.dateOfLastModification = dateOfLastModification;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 
     public ListOfItems getListOfItems() {
         return listOfItems;
