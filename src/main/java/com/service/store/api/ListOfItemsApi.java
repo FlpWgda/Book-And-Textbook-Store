@@ -54,7 +54,7 @@ public class ListOfItemsApi {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     @RequestMapping(value = "/api/list/removeFromBasket/{itemId}",
-            method = RequestMethod.POST)
+            method = RequestMethod.DELETE)
     public ResponseEntity<ListOfItems> removeFromBasket(@RequestAttribute Claims claims, @PathVariable("itemId") Integer itemId) {
 
         User user = userRepository.findById((String) claims.get("login")).get();
@@ -70,7 +70,7 @@ public class ListOfItemsApi {
             }
             List<Item> basketItems = basket.getItems();
             for(Item i:basketItems){
-                if(i.getItemId().equals(itemId)){
+                if(i.getItemId() == itemId){
                     basketItems.remove(i);
                     listOfItemsRepository.save(basket);
                     return new ResponseEntity<>(basket,HttpStatus.OK);
@@ -94,6 +94,22 @@ public class ListOfItemsApi {
 
         return new ResponseEntity<>(listOfItems,HttpStatus.OK);
     }
+    @RequestMapping(value = "/api/list/{listId}",
+            method = RequestMethod.DELETE)
+    public ResponseEntity<Void> removeList(@RequestAttribute Claims claims, @PathVariable Integer listId) {
+
+        User user = userRepository.findById((String) claims.get("login")).get();
+        List<ListOfItems> listOfItemsList = user.getListsOfItems();
+        for(ListOfItems l: listOfItemsList){
+            if(l.getListOfItemsId() == listId && !l.isBasket()){
+                listOfItemsList.remove(l);
+                listOfItemsRepository.delete(l);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
     @RequestMapping(value = "/api/list/addToList/{itemId}",
             method = RequestMethod.POST)
     public ResponseEntity<ListOfItems> addToList(@RequestAttribute Claims claims, @PathVariable("itemId") Integer itemId, @RequestParam(value = "listName", required = true) String listName) {
