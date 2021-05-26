@@ -42,12 +42,44 @@ public class ListOfItemsApi {
                 }
             }
             List<Item> basketItems = basket.getItems();
+            for(Item i:basketItems){
+                if(i.equals(itemOptional.get())){
+                    return new ResponseEntity<>(HttpStatus.CONFLICT);
+                }
+            }
             basketItems.add(itemOptional.get());
             listOfItemsRepository.save(basket);
             return new ResponseEntity<>(basket, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+    @RequestMapping(value = "/api/list/removeFromBasket/{itemId}",
+            method = RequestMethod.POST)
+    public ResponseEntity<ListOfItems> removeFromBasket(@RequestAttribute Claims claims, @PathVariable("itemId") Integer itemId) {
+
+        User user = userRepository.findById((String) claims.get("login")).get();
+        Optional<Item> itemOptional = itemRepository.findById(itemId);
+
+        if(itemOptional.isPresent()){
+            ListOfItems basket = null;
+            for(ListOfItems l: user.getListsOfItems()){
+                if(l.isBasket()){
+                    basket = l;
+                    break;
+                }
+            }
+            List<Item> basketItems = basket.getItems();
+            for(Item i:basketItems){
+                if(i.getItemId().equals(itemId)){
+                    basketItems.remove(i);
+                    listOfItemsRepository.save(basket);
+                    return new ResponseEntity<>(basket,HttpStatus.OK);
+                }
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
     @RequestMapping(value = "/api/list",
             method = RequestMethod.POST)
     public ResponseEntity<ListOfItems> addNewList(@RequestAttribute Claims claims, @RequestBody ListOfItems listOfItems) {
@@ -60,7 +92,7 @@ public class ListOfItemsApi {
         user.setListsOfItems(listOfItemsList);
         userRepository.save(user);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(listOfItems,HttpStatus.OK);
     }
     @RequestMapping(value = "/api/list/addToList/{itemId}",
             method = RequestMethod.POST)
