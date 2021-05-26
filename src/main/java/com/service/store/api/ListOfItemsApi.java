@@ -31,9 +31,9 @@ public class ListOfItemsApi {
     public ResponseEntity<ListOfItems> addToBasket(@RequestAttribute Claims claims, @PathVariable("itemId") Integer itemId) {
 
         User user = userRepository.findById((String) claims.get("login")).get();
-        Optional<Item> item = itemRepository.findById(itemId);
+        Optional<Item> itemOptional = itemRepository.findById(itemId);
 
-        if(item.isPresent()){
+        if(itemOptional.isPresent()){
             ListOfItems basket = null;
             for(ListOfItems l: user.getListsOfItems()){
                 if(l.isBasket()){
@@ -42,9 +42,50 @@ public class ListOfItemsApi {
                 }
             }
             List<Item> basketItems = basket.getItems();
-            basketItems.add(item.get());
+            basketItems.add(itemOptional.get());
             listOfItemsRepository.save(basket);
             return new ResponseEntity<>(basket, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    @RequestMapping(value = "/api/list",
+            method = RequestMethod.POST)
+    public ResponseEntity<ListOfItems> addNewList(@RequestAttribute Claims claims, @RequestBody ListOfItems listOfItems) {
+
+        User user = userRepository.findById((String) claims.get("login")).get();
+        List<ListOfItems> listOfItemsList = user.getListsOfItems();
+        listOfItems.setBasket(false);
+        listOfItems.setDateAdded(Timestamp.valueOf(LocalDateTime.now()));
+        listOfItemsList.add(listOfItems);
+        user.setListsOfItems(listOfItemsList);
+        userRepository.save(user);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @RequestMapping(value = "/api/list/addToList/{itemId}",
+            method = RequestMethod.POST)
+    public ResponseEntity<ListOfItems> addToList(@RequestAttribute Claims claims, @PathVariable("itemId") Integer itemId, @RequestParam(value = "listName", required = true) String listName) {
+
+        User user = userRepository.findById((String) claims.get("login")).get();
+        Optional<Item> itemOptional = itemRepository.findById(itemId);
+        ListOfItems listOfItems = null;
+        for(ListOfItems l:user.getListsOfItems()){
+            if(l.getName().equals(listName)){
+                listOfItems = l;
+                break;
+            }
+        }
+
+        if(itemOptional.isPresent() && listOfItems != null){
+            for(Item i:listOfItems.getItems()){
+                if(i.equals(itemOptional.get())){
+                    return new ResponseEntity<>(HttpStatus.CONFLICT);
+                }
+            }
+            List<Item> listItems = listOfItems.getItems();
+            listItems.add(itemOptional.get());
+            listOfItemsRepository.save(listOfItems);
+            return new ResponseEntity<>(listOfItems, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
