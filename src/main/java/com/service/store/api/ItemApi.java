@@ -75,7 +75,9 @@ public class ItemApi {
 
         Optional<Item> itemOptional = itemRepository.findById(itemId);
         if(itemOptional.isPresent()){
-            return new ResponseEntity<Item>(itemOptional.get(),HttpStatus.OK);
+            if(itemOptional.get().isVisible()){
+                return new ResponseEntity<Item>(itemOptional.get(),HttpStatus.OK);
+            }
         }
         return new ResponseEntity<Item>(HttpStatus.NOT_FOUND);
     }
@@ -84,14 +86,22 @@ public class ItemApi {
             method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteItemById(@RequestAttribute Claims claims, @PathVariable("itemId") Integer itemId){
 
-        itemRepository.deleteById(itemId);
+        Optional<Item> itemOptional = itemRepository.findById(itemId);
+        if(itemOptional.isPresent()){
+            itemOptional.get().setVisible(false);
+        }
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
     @RequestMapping(value = "/api/item/myItems",
             method = RequestMethod.GET)
     public ResponseEntity<List<Item>> myItems(@RequestAttribute Claims claims){
         User user = userRepository.findById((String) claims.get("login")).get();
-        List<Item> listOfItems = user.getItems();
+        List<Item> listOfItems = new ArrayList<Item>();
+        for(Item i: user.getItems()){
+            if(i.isVisible()){
+                listOfItems.add(i);
+            }
+        }
         return new ResponseEntity<>(listOfItems,HttpStatus.OK);
     }
 
