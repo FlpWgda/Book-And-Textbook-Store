@@ -107,10 +107,10 @@ public class ItemApi {
 
     @RequestMapping(value = "/api/item/search",
             method = RequestMethod.GET)
-    public ResponseEntity<List<Item>> searchItems(@RequestAttribute Claims claims, @RequestParam(value = "keyword", required = true) String keyword){
-        User user = userRepository.findById((String) claims.get("login")).get();
-        List<Item> listOfItems = user.getItems();
-        return new ResponseEntity<>(listOfItems,HttpStatus.OK);
+    public ResponseEntity<List<Item>> searchItems(@RequestParam(value = "keyword", required = true) String keyword){
+
+        List<Item> list1 = itemRepository.findByNameContainingOrPublishingHouseContainingOrAuthors_NameContainingOrCategories_GenreNameContaining(keyword, keyword, keyword, keyword);
+        return new ResponseEntity<>(list1,HttpStatus.OK);
     }
 
     @RequestMapping(value = "/api/item/recommended/{amount}",
