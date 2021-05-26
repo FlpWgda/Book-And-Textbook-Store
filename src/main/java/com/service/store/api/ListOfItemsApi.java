@@ -58,25 +58,24 @@ public class ListOfItemsApi {
     public ResponseEntity<ListOfItems> removeFromBasket(@RequestAttribute Claims claims, @PathVariable("itemId") Integer itemId) {
 
         User user = userRepository.findById((String) claims.get("login")).get();
-        Optional<Item> itemOptional = itemRepository.findById(itemId);
 
-        if(itemOptional.isPresent()){
-            ListOfItems basket = null;
-            for(ListOfItems l: user.getListsOfItems()){
-                if(l.isBasket()){
-                    basket = l;
-                    break;
-                }
-            }
-            List<Item> basketItems = basket.getItems();
-            for(Item i:basketItems){
-                if(i.getItemId() == itemId){
-                    basketItems.remove(i);
-                    listOfItemsRepository.save(basket);
-                    return new ResponseEntity<>(basket,HttpStatus.OK);
-                }
+
+        ListOfItems basket = null;
+        for(ListOfItems l: user.getListsOfItems()){
+            if(l.isBasket()){
+                basket = l;
+                break;
             }
         }
+        List<Item> basketItems = basket.getItems();
+        for(Item i:basketItems){
+            if(i.getItemId() == itemId){
+                basketItems.remove(i);
+                listOfItemsRepository.save(basket);
+                return new ResponseEntity<>(basket,HttpStatus.OK);
+            }
+        }
+
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
@@ -111,7 +110,7 @@ public class ListOfItemsApi {
         return new ResponseEntity<>(listOfItems,HttpStatus.OK);
     }
     @RequestMapping(value = "/api/list/{listId}",
-            method = RequestMethod.DELETE)
+            method = RequestMethod.GET)
     public ResponseEntity<ListOfItems> getListById(@RequestAttribute Claims claims, @PathVariable Integer listId) {
 
         User user = userRepository.findById((String) claims.get("login")).get();
@@ -153,6 +152,9 @@ public class ListOfItemsApi {
                 break;
             }
         }
+        if(listOfItems == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
         if(itemOptional.isPresent() && listOfItems != null){
             for(Item i:listOfItems.getItems()){
@@ -165,6 +167,33 @@ public class ListOfItemsApi {
             listOfItemsRepository.save(listOfItems);
             return new ResponseEntity<>(listOfItems, HttpStatus.OK);
         }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    @RequestMapping(value = "/api/list/removeFromList/{itemId}",
+            method = RequestMethod.DELETE)
+    public ResponseEntity<ListOfItems> removeFromList(@RequestAttribute Claims claims, @PathVariable("itemId") Integer itemId, @RequestParam(value = "listName", required = true) String listName) {
+
+        User user = userRepository.findById((String) claims.get("login")).get();
+        ListOfItems listOfItems = null;
+        for(ListOfItems l:user.getListsOfItems()){
+            if(l.getName().equals(listName)){
+                listOfItems = l;
+                break;
+            }
+        }
+        if(listOfItems == null){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        List<Item> itemList = listOfItems.getItems();
+        for(Item i:itemList){
+            if(i.getItemId() == itemId){
+                itemList.remove(i);
+                listOfItemsRepository.save(listOfItems);
+                return new ResponseEntity<>(listOfItems,HttpStatus.OK);
+            }
+        }
+
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
