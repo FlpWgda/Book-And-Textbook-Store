@@ -80,6 +80,22 @@ public class ListOfItemsApi {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @RequestMapping(value = "/api/list/getBasket",
+            method = RequestMethod.GET)
+    public ResponseEntity<ListOfItems> getBasket(@RequestAttribute Claims claims) {
+
+        User user = userRepository.findById((String) claims.get("login")).get();
+
+        ListOfItems basket = null;
+        for(ListOfItems l: user.getListsOfItems()){
+            if(l.isBasket()){
+                basket = l;
+                break;
+            }
+        }
+        return new ResponseEntity<>(basket,HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/api/list",
             method = RequestMethod.POST)
     public ResponseEntity<ListOfItems> addNewList(@RequestAttribute Claims claims, @RequestBody ListOfItems listOfItems) {
@@ -96,7 +112,21 @@ public class ListOfItemsApi {
     }
     @RequestMapping(value = "/api/list/{listId}",
             method = RequestMethod.DELETE)
-    public ResponseEntity<Void> removeList(@RequestAttribute Claims claims, @PathVariable Integer listId) {
+    public ResponseEntity<ListOfItems> getListById(@RequestAttribute Claims claims, @PathVariable Integer listId) {
+
+        User user = userRepository.findById((String) claims.get("login")).get();
+        List<ListOfItems> listOfItemsList = user.getListsOfItems();
+        for(ListOfItems l: listOfItemsList){
+            if(l.getListOfItemsId() == listId && !l.isBasket()){
+                return new ResponseEntity<>(l,HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(value = "/api/list/{listId}",
+            method = RequestMethod.DELETE)
+    public ResponseEntity<Void> removeListById(@RequestAttribute Claims claims, @PathVariable Integer listId) {
 
         User user = userRepository.findById((String) claims.get("login")).get();
         List<ListOfItems> listOfItemsList = user.getListsOfItems();
