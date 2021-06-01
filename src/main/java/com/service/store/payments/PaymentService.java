@@ -145,4 +145,51 @@ public class PaymentService {
         return redirectUri;
 
     }
+    public String makePaymentTest(String token, String continueUrl) throws IOException, InterruptedException {
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        JSONObject jsonObject1 = new JSONObject()
+                //.put("notifyUrl","https://your.eshop.com/notify")
+                .put("customerIp","127.0.0.1")
+                .put("merchantPosId","409761")
+                .put("description","textbook_store")
+                .put("currencyCode","PLN")
+                .put("totalAmount","21000")
+                .put("buyer",new JSONObject()
+                        .put("email","test.user@gmail.com")
+                        //.put("firstName","Filip")
+                        //.put("lastName","Wgda")
+                        .put("language","en"))
+                .put("products", new JSONArray()
+                        .put(new JSONObject()
+                                .put("name","a")
+                                .put("unitPrice","21000")
+                                .put("quantity","1")));
+        if(continueUrl != null){
+            jsonObject1.put("continueUrl", continueUrl);
+        }
+
+        System.out.println(jsonObject1.toString());
+
+        HttpRequest requestOrder = HttpRequest.newBuilder()
+                .uri(URI.create("https://secure.snd.payu.com/api/v2_1/orders"))
+                .POST(HttpRequest.BodyPublishers.ofString(jsonObject1.toString()))
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        HttpResponse<String> response1 = client.send(requestOrder,
+                HttpResponse.BodyHandlers.ofString());
+
+        System.out.println(response1.body());
+
+        JSONObject jsonObject2 = new JSONObject(response1.body());
+        Map<String, Object> map = jsonObject2.toMap();
+        String redirectUri = map.get("redirectUri").toString();
+        System.out.println(redirectUri);
+
+        return redirectUri;
+
+    }
 }
