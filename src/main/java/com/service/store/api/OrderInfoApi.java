@@ -37,14 +37,14 @@ public class OrderInfoApi {
 
     @RequestMapping(value = "/api/list/buy",
             method = RequestMethod.POST)
-    public ResponseEntity<ListOfItems> buy(@RequestAttribute Claims claims) throws IOException, InterruptedException {
+    public ResponseEntity<ListOfItems> buy(@RequestAttribute Claims claims, @RequestParam(value = "continueUrl", required = true) String continueUrl) throws IOException, InterruptedException {
 
         User user = userRepository.findById((String) claims.get("login")).get();
 
         PaymentService paymentService = new PaymentService();
         String token = paymentService.getToken();
 
-        String redirectUri = paymentService.makePayment(token,user);
+        String redirectUri = paymentService.makePayment(token,user,continueUrl);
 
         userRepository.save(user);
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(redirectUri)).build();

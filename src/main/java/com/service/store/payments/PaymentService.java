@@ -62,7 +62,7 @@ public class PaymentService {
         return jsonObject.getString("access_token");
     }
 
-    public String makePayment(String token, User user) throws IOException, InterruptedException {
+    public String makePayment(String token, User user, String continueUrl) throws IOException, InterruptedException {
 
         HttpClient client = HttpClient.newHttpClient();
 
@@ -110,6 +110,10 @@ public class PaymentService {
                 .put("buyer", new JSONObject()
                         .put("language", "en"))
                 .put("products", products);
+        if(continueUrl != null){
+            jsonObject1.put("continueUrl", continueUrl);
+        }
+
         if(user.getFirstName() != null){
             jsonObject1.getJSONObject("buyer")
                     .put("firstName", user.getFirstName());
