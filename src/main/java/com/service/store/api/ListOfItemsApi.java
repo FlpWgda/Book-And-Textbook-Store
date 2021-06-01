@@ -111,6 +111,12 @@ public class ListOfItemsApi {
 
         User user = userRepository.findById((String) claims.get("login")).get();
         List<ListOfItems> listOfItemsList = user.getListsOfItems();
+
+        for(ListOfItems l:listOfItemsList){
+            if(l.getName().equals(listOfItems.getName())){
+                return new ResponseEntity<>(HttpStatus.CONFLICT);
+            }
+        }
         listOfItems.setBasket(false);
         listOfItems.setDateAdded(Timestamp.valueOf(LocalDateTime.now()));
         listOfItemsList.add(listOfItems);
