@@ -119,6 +119,19 @@ public class ListOfItemsApi {
 
         return new ResponseEntity<>(listOfItems,HttpStatus.OK);
     }
+    @RequestMapping(value = "/api/list/findAll",
+            method = RequestMethod.GET)
+    public ResponseEntity<List<ListOfItems>> getAllLists(@RequestAttribute Claims claims){
+        User user = userRepository.findById((String) claims.get("login")).get();
+        List<ListOfItems> listOfItemsList = new ArrayList<>();
+        for(ListOfItems l:user.getListsOfItems()){
+            if(!l.getName().equals("basket")){
+                listOfItemsList.add(l);
+            }
+        }
+        return new ResponseEntity<>(listOfItemsList,HttpStatus.OK);
+
+    }
     @RequestMapping(value = "/api/list/{listId}",
             method = RequestMethod.GET)
     public ResponseEntity<ListOfItems> getListById(@RequestAttribute Claims claims, @PathVariable Integer listId) {
