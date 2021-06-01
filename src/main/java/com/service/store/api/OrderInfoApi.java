@@ -44,7 +44,6 @@ public class OrderInfoApi {
         PaymentService paymentService = new PaymentService();
         String token = paymentService.getToken();
 
-        //responseBodyMap.put("redirectUri", PaymentService.makePayment(token));
         String redirectUri = paymentService.makePayment(token,user);
 
         userRepository.save(user);
@@ -63,26 +62,6 @@ public class OrderInfoApi {
             method = RequestMethod.POST)
     public void stateOfOrder(@RequestBody RequestBody requestBody){
 
-    }
-
-    @RequestMapping(value = "/payu",
-            method = RequestMethod.POST)
-    public ResponseEntity<Void> payu(){
-        try {
-            /**HttpResponse httpResponse = PaymentService.getToken();
-            JSONObject responseBodyToJSON = new JSONObject(httpResponse.body());**/
-            //Map<String,String> responseBodyMap = new HashMap<>();
-            PaymentService paymentService = new PaymentService();
-            String token = paymentService.getToken();
-
-            //responseBodyMap.put("redirectUri", PaymentService.makePayment(token));
-            return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(paymentService.makePaymentTest(token))).build();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
 }

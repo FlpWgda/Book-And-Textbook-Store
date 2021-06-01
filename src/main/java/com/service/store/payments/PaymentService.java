@@ -58,56 +58,10 @@ public class PaymentService {
                 HttpResponse.BodyHandlers.ofString());
 
         JSONObject jsonObject = new JSONObject(response.body());
-        System.out.println("Response body: " + response.body());
-        System.out.println(jsonObject.get("access_token"));
 
         return jsonObject.getString("access_token");
     }
 
-    public String makePaymentTest(String token) throws IOException, InterruptedException {
-
-        HttpClient client = HttpClient.newHttpClient();
-
-        JSONObject jsonObject1 = new JSONObject()
-                //.put("notifyUrl","https://your.eshop.com/notify")
-                .put("customerIp","127.0.0.1")
-                .put("merchantPosId","409761")
-                .put("description","textbook_store")
-                .put("currencyCode","PLN")
-                .put("totalAmount","21000")
-                .put("buyer",new JSONObject()
-                        .put("email","test.user@gmail.com")
-                        //.put("firstName","Filip")
-                        //.put("lastName","Wgda")
-                        .put("language","en"))
-                .put("products", new JSONArray()
-                        .put(new JSONObject()
-                                .put("name","a")
-                                .put("unitPrice","21000")
-                                .put("quantity","1")));
-
-        System.out.println(jsonObject1.toString());
-
-        HttpRequest requestOrder = HttpRequest.newBuilder()
-                .uri(URI.create("https://secure.snd.payu.com/api/v2_1/orders"))
-                .POST(HttpRequest.BodyPublishers.ofString(jsonObject1.toString()))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + token)
-                .build();
-
-        HttpResponse<String> response1 = client.send(requestOrder,
-                HttpResponse.BodyHandlers.ofString());
-
-        System.out.println(response1.body());
-
-        JSONObject jsonObject2 = new JSONObject(response1.body());
-        Map<String, Object> map = jsonObject2.toMap();
-        String redirectUri = map.get("redirectUri").toString();
-        System.out.println(redirectUri);
-
-        return redirectUri;
-
-    }
     public String makePayment(String token, User user) throws IOException, InterruptedException {
 
         HttpClient client = HttpClient.newHttpClient();
@@ -145,7 +99,6 @@ public class PaymentService {
         basket.setBasket(false);
         user.getListsOfItems().add(newBasket);
 
-        System.out.println(user.getLogin());
 
         JSONObject jsonObject1 = new JSONObject()
                 //.put("notifyUrl","http://"+InetAddress.getLoopbackAddress().getHostName()+":8080/stateOfOrder")
@@ -157,9 +110,7 @@ public class PaymentService {
                 .put("buyer", new JSONObject()
                         .put("language", "en"))
                 .put("products", products);
-        System.out.println("Pierwsze imię: " + user.getFirstName());
         if(user.getFirstName() != null){
-            System.out.println("Jestem tu");
             jsonObject1.getJSONObject("buyer")
                     .put("firstName", user.getFirstName());
         }
@@ -172,7 +123,6 @@ public class PaymentService {
                     .put("email",user.getEmail());
         }
 
-        System.out.println(jsonObject1.toString());
 
         HttpRequest requestOrder = HttpRequest.newBuilder()
                 .uri(URI.create("https://secure.snd.payu.com/api/v2_1/orders"))
@@ -184,12 +134,9 @@ public class PaymentService {
         HttpResponse<String> response1 = client.send(requestOrder,
                 HttpResponse.BodyHandlers.ofString());
 
-        System.out.println(response1.body());
-
         JSONObject jsonObject2 = new JSONObject(response1.body());
         Map<String, Object> map = jsonObject2.toMap();
         String redirectUri = map.get("redirectUri").toString();
-        System.out.println(redirectUri);
 
         return redirectUri;
 
