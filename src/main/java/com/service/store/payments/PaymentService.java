@@ -170,8 +170,6 @@ public class PaymentService {
             jsonObject1.put("continueUrl", continueUrl);
         }
 
-        System.out.println(jsonObject1.toString());
-
         HttpRequest requestOrder = HttpRequest.newBuilder()
                 .uri(URI.create("https://secure.snd.payu.com/api/v2_1/orders"))
                 .POST(HttpRequest.BodyPublishers.ofString(jsonObject1.toString()))
@@ -182,12 +180,10 @@ public class PaymentService {
         HttpResponse<String> response1 = client.send(requestOrder,
                 HttpResponse.BodyHandlers.ofString());
 
-        System.out.println(response1.body());
 
         JSONObject jsonObject2 = new JSONObject(response1.body());
         Map<String, Object> map = jsonObject2.toMap();
         String redirectUri = map.get("redirectUri").toString();
-        System.out.println(redirectUri);
 
         return redirectUri;
 
