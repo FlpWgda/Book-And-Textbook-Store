@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +54,7 @@ public class ListOfItemsApi {
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
     @RequestMapping(value = "/api/list/removeFromBasket/{itemId}",
             method = RequestMethod.DELETE)
     public ResponseEntity<ListOfItems> removeFromBasket(@RequestAttribute Claims claims, @PathVariable("itemId") Integer itemId) {
@@ -89,6 +91,14 @@ public class ListOfItemsApi {
         for(ListOfItems l: user.getListsOfItems()){
             if(l.isBasket()){
                 basket = l;
+                List<Item> newItemList = new ArrayList<>();
+                for(Item i:l.getItems()){
+                    if(i.isVisible()){
+                        newItemList.add(i);
+                    }
+                }
+                l.setItems(newItemList);
+                listOfItemsRepository.save(l);
                 break;
             }
         }
@@ -117,6 +127,14 @@ public class ListOfItemsApi {
         List<ListOfItems> listOfItemsList = user.getListsOfItems();
         for(ListOfItems l: listOfItemsList){
             if(l.getListOfItemsId() == listId && !l.isBasket()){
+                List<Item> newItemList = new ArrayList<>();
+                for(Item i:l.getItems()){
+                    if(i.isVisible()){
+                        newItemList.add(i);
+                    }
+                }
+                l.setItems(newItemList);
+                listOfItemsRepository.save(l);
                 return new ResponseEntity<>(l,HttpStatus.OK);
             }
         }
