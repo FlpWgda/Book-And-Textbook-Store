@@ -2,9 +2,12 @@ package com.service.store.api;
 
 import com.service.store.dao.*;
 import com.service.store.entity.*;
+import com.service.store.recommendation.RecommendationEngine;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.mahout.cf.taste.common.TasteException;
+import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -117,7 +121,29 @@ public class ItemApi {
             method = RequestMethod.GET)
     public ResponseEntity<List<Item>> findRecommended(@RequestAttribute Claims claims, @PathVariable("amount") Integer amount){
         User user = userRepository.findById((String) claims.get("login")).get();
-        List<Item> listOfItems = user.getItems();
+        List<Item> listOfItems = new ArrayList<>();
+        try {
+            List<RecommendedItem> recommendedGenres = RecommendationEngine.recommendGenres(user.getLogin(),2);
+            float totalRecommendationValue = 0.0f;
+
+            for(RecommendedItem r: recommendedGenres){
+                totalRecommendationValue += r.getValue();
+            }
+            for(int i = 0; i < amount; i++){
+                int idx = 0;
+                for (double r = Math.random() * totalRecommendationValue; idx < recommendedGenres.size() - 1; ++idx) {
+                    r -= recommendedGenres.get(idx).getValue();
+                    if (r <= 0.0) break;
+                }
+                RecommendedItem myRandomItem = recommendedGenres.get(idx);
+                List<Item> itemList = itemRepository.findByCategories_GenreName(RecommendationEngine.genreNameById(myRandomItem.getItemID()));
+                listOfItems.add(itemList.get(0));
+            }
+
+        } catch (TasteException e) {
+            e.printStackTrace();
+        }
+
         return new ResponseEntity<>(listOfItems,HttpStatus.OK);
     }
 

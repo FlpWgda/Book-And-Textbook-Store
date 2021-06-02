@@ -10,5 +10,6 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
     List<Item> findByNameContaining(String keyword);
     List<Item> findByPublishingHouseContaining(String keyword);
     List<Item> findByAuthors_NameContaining(String keyword);
+    List<Item> findByCategories_GenreName(String genreName);
     List<Item> findByNameContainingOrPublishingHouseContainingOrAuthors_NameContainingOrCategories_GenreNameContaining(String keyword1, String keyword2, String keyword3, String keyword4);
 }

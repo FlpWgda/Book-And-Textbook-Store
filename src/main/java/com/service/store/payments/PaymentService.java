@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.service.store.dao.ListOfItemsRepository;
 import com.service.store.dao.UserRepository;
 import com.service.store.entity.*;
+import com.service.store.recommendation.RecommendationEngine;
 import org.apache.catalina.connector.Response;
+import org.apache.mahout.cf.taste.impl.model.GenericPreference;
+import org.apache.mahout.cf.taste.model.Preference;
 import org.apache.tomcat.util.json.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -80,6 +83,33 @@ public class PaymentService {
                             .put("name", i.getName())
                             .put("unitPrice", String.valueOf((int)(i.getPrice() * 100)))
                             .put("quantity", "1"));
+
+                    long userId;
+                    if(RecommendationEngine.userIds.containsKey(user.getLogin())){
+                        userId = RecommendationEngine.userIds.get(user.getLogin());
+                    }
+                    else{
+                        userId = RecommendationEngine.userIds.size();
+                        RecommendationEngine.userIds.put(user.getLogin(),userId);
+                    }
+                    for(Category c:i.getCategories()){
+                        long genreId;
+                        if(RecommendationEngine.genreIds.containsKey(c.getGenreName())){
+                            genreId = RecommendationEngine.genreIds.get(c.getGenreName());
+                        }
+                        else{
+                            genreId = RecommendationEngine.genreIds.size();
+                            RecommendationEngine.genreIds.put(c.getGenreName(),genreId);
+                        }
+
+                        if(RecommendationEngine.userPreferences.containsKey(userId)){
+                            if(RecommendationEngine.userPreferences.get(userId).containsKey(genreId)){
+                                RecommendationEngine.userPreferences.get(userId).put(genreId,RecommendationEngine.userPreferences.get(userId).get(genreId)+1);
+                            }
+                        }
+
+                    }
+
                 }
             }
         }
