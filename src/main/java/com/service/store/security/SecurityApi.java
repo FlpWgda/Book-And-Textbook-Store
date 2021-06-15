@@ -3,8 +3,10 @@ package com.service.store.security;
 import com.service.store.dao.ListOfItemsRepository;
 import com.service.store.dao.UserRepository;
 import com.service.store.entity.ListOfItems;
+import com.service.store.entity.OrderInfo;
 import com.service.store.entity.Role;
 import com.service.store.entity.User;
+import com.service.store.recommendation.RecommendationEngine;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,6 +43,12 @@ public class SecurityApi {
                         .compact();
                 Map<String,String> tokenMap = new HashMap<>();
                 tokenMap.put("token", token);
+
+                RecommendationEngine.addUserToPreferenceList(userOptional.get());
+                for(OrderInfo orderInfo: userOptional.get().getOrderInfos()){
+                    RecommendationEngine.addOrderInfoToPreferences(orderInfo.getListOfItems(),userOptional.get());
+                }
+
                 return new ResponseEntity<>(tokenMap, HttpStatus.OK);
             }
             else{
