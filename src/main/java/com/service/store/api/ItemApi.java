@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @CrossOrigin
@@ -123,7 +120,13 @@ public class ItemApi {
         User user = userRepository.findById((String) claims.get("login")).get();
         List<Item> listOfItems = new ArrayList<>();
         try {
-            List<RecommendedItem> recommendedGenres = RecommendationEngine.recommendGenres(user.getLogin(),2);
+            if(!RecommendationEngine.userIds.containsKey(user.getLogin())){
+                long userId = RecommendationEngine.userIds.size();
+                RecommendationEngine.userIds.put(user.getLogin(),userId);
+            }
+            List<RecommendedItem> recommendedGenres = RecommendationEngine.recommendGenres(user.getLogin(),amount);
+            System.out.println("Recommended genres: " + recommendedGenres.toString());
+            System.out.println(recommendedGenres.size());
             float totalRecommendationValue = 0.0f;
 
             for(RecommendedItem r: recommendedGenres){
@@ -136,8 +139,15 @@ public class ItemApi {
                     if (r <= 0.0) break;
                 }
                 RecommendedItem myRandomItem = recommendedGenres.get(idx);
+                System.out.println("ID: " + myRandomItem.getItemID() + " name: " + RecommendationEngine.genreNameById(myRandomItem.getItemID()));
                 List<Item> itemList = itemRepository.findByCategories_GenreName(RecommendationEngine.genreNameById(myRandomItem.getItemID()));
-                listOfItems.add(itemList.get(0));
+                if(itemList.isEmpty()){
+                    i--;
+                }
+                else {
+                    Collections.shuffle(itemList);
+                    listOfItems.add(itemList.get(0));
+                }
             }
 
         } catch (TasteException e) {

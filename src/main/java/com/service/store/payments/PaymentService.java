@@ -1,28 +1,18 @@
 package com.service.store.payments;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.service.store.dao.ListOfItemsRepository;
 import com.service.store.dao.UserRepository;
 import com.service.store.entity.*;
 import com.service.store.recommendation.RecommendationEngine;
-import org.apache.catalina.connector.Response;
-import org.apache.mahout.cf.taste.impl.model.GenericPreference;
-import org.apache.mahout.cf.taste.model.Preference;
-import org.apache.tomcat.util.json.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.StreamingHttpOutputMessage;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.sql.Timestamp;
@@ -76,6 +66,7 @@ public class PaymentService {
         for(ListOfItems l: user.getListsOfItems()) {
             if (l.isBasket()) {
                 basket = l;
+                RecommendationEngine.addOrderInfoToPreferences(basket, user);
                 for (Item i : basket.getItems()) {
                     i.setVisible(false);
                     costOfBasket += i.getPrice();
@@ -84,31 +75,6 @@ public class PaymentService {
                             .put("unitPrice", String.valueOf((int)(i.getPrice() * 100)))
                             .put("quantity", "1"));
 
-                    long userId;
-                    if(RecommendationEngine.userIds.containsKey(user.getLogin())){
-                        userId = RecommendationEngine.userIds.get(user.getLogin());
-                    }
-                    else{
-                        userId = RecommendationEngine.userIds.size();
-                        RecommendationEngine.userIds.put(user.getLogin(),userId);
-                    }
-                    for(Category c:i.getCategories()){
-                        long genreId;
-                        if(RecommendationEngine.genreIds.containsKey(c.getGenreName())){
-                            genreId = RecommendationEngine.genreIds.get(c.getGenreName());
-                        }
-                        else{
-                            genreId = RecommendationEngine.genreIds.size();
-                            RecommendationEngine.genreIds.put(c.getGenreName(),genreId);
-                        }
-
-                        if(RecommendationEngine.userPreferences.containsKey(userId)){
-                            if(RecommendationEngine.userPreferences.get(userId).containsKey(genreId)){
-                                RecommendationEngine.userPreferences.get(userId).put(genreId,RecommendationEngine.userPreferences.get(userId).get(genreId)+1);
-                            }
-                        }
-
-                    }
 
                 }
             }
