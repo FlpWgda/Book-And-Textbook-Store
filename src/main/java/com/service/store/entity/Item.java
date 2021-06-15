@@ -28,6 +28,8 @@ public class Item {
 
     private Integer releaseYear;
 
+    private Double highestBid;
+
 
     @Enumerated(EnumType.STRING)
     private ItemCondition itemCondition;
@@ -140,5 +142,15 @@ public class Item {
 
     public void setReleaseYear(Integer releaseYear) {
         this.releaseYear = releaseYear;
+    }
+
+    public Double getHighestBid() {
+        return highestBid;
+    }
+
+    public void setHighestBid(Double highestBid) {
+        if(highestBid > this.highestBid){
+            this.highestBid = highestBid;
+        }
     }
 }
