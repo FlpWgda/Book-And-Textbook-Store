@@ -26,7 +26,7 @@ public class BidApi {
 
     @RequestMapping(value = "/api/bid/{itemId}",
             method = RequestMethod.POST)
-    public ResponseEntity<Item> postNewBid(@RequestAttribute Claims claims, @PathVariable("itemId") Integer itemId, @RequestBody Double bid){
+    public ResponseEntity<Item> postNewBid(@RequestAttribute Claims claims, @PathVariable("itemId") Integer itemId, @RequestParam Double bid){
         Optional<Item> itemOptional = itemRepository.findById(itemId);
 
         if(itemOptional.isPresent()){
