@@ -149,7 +149,10 @@ public class Item {
     }
 
     public void setHighestBid(Double highestBid) {
-        if(highestBid > this.highestBid){
+        if(highestBid == null){
+            this.highestBid = null;
+        }
+        else if(this.highestBid == null || highestBid > this.highestBid){
             this.highestBid = highestBid;
         }
     }
