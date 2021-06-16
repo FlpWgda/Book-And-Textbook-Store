@@ -108,7 +108,7 @@ public class ItemApi {
 
     @RequestMapping(value = "/api/item/search",
             method = RequestMethod.GET)
-    public ResponseEntity<List<Item>> searchItems(@RequestParam(value = "keyword", required = true) String keyword){
+    public ResponseEntity<List<Item>> searchItems(@RequestAttribute Claims claims, @RequestParam(value = "keyword", required = true) String keyword){
 
         List<Item> list1 = itemRepository.findByNameContainingOrPublishingHouseContainingOrAuthors_NameContainingOrCategories_GenreNameContaining(keyword, keyword, keyword, keyword);
         return new ResponseEntity<>(list1,HttpStatus.OK);
